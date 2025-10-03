@@ -7,4 +7,5 @@
 7. Optional file .env.example untuk contoh env variable
 8. Jalankan node index.js untuk test / npm start
 
-`FILE geminiAI code V1`
+`PREVIEW`
+<img width="1920" height="1005" alt="Screenshot from 2025-10-03 23-26-13" src="https://github.com/user-attachments/assets/99940433-b78f-4577-b90c-a38e51543933" />
