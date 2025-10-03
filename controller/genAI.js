@@ -46,6 +46,58 @@ const createInlineDataPart = (filePath, mimeType) => {
 
 // Handler untuk /chat
 export const chatHandler = (ai) => async (req, res) => {
+  const { conversation } = req.body;
+
+  // Validasi input 'conversation'
+  if (!conversation || !Array.isArray(conversation)) {
+    return res.status(400).json({
+      message: "Percakapan harus di isi dan berupa array!",
+      data: null,
+      success: false,
+    });
+  }
+
+  // Validasi setiap pesan dalam percakapan
+  const conversationIsValid = conversation.every((message) => {
+    if (!message || typeof message !== "object" || Array.isArray(message)) {
+      return false;
+    }
+    const keys = Object.keys(message);
+    const keysLengthIsValid = keys.length === 2;
+    const keyContainsValidName = keys.every((key) =>
+      ["role", "text"].includes(key)
+    );
+    if (!keysLengthIsValid || !keyContainsValidName) return false;
+
+    const { role, text } = message;
+    const roleIsvalid = ["user", "model"].includes(role);
+    const textIsvalid = typeof text === "string";
+    return roleIsvalid && textIsvalid;
+  });
+
+  if (!conversationIsValid) {
+    return res.status(400).json({
+      message: "Struktur percakapan tidak valid.",
+      data: null,
+      success: false,
+    });
+  }
+
+  const contents = conversation.map(({ role, text }) => ({
+    role,
+    parts: [{ text }],
+  }));
+
+  await generateContentResponse(
+    ai,
+    res,
+    contents,
+    "Berhasil diresponse oleh AI Flash"
+  );
+};
+
+// Handler untuk /generate-text
+export const generateTextHandler = (ai) => async (req, res) => {
   const { prompt } = req.body;
 
   if (!prompt || typeof prompt !== "string") {
@@ -56,12 +108,7 @@ export const chatHandler = (ai) => async (req, res) => {
     });
   }
 
-  const contents = [
-    {
-      parts: [{ text: prompt }],
-    },
-  ];
-
+  const contents = [{ parts: [{ text: prompt }] }];
   await generateContentResponse(ai, res, contents);
 };
 

@@ -16,7 +16,10 @@ const upload = multer({
 app.use(cors());
 app.use(express.json());
 
-app.use("/", geminiRoutes({ app, ai, upload }));
+app.use(express.json());
+app.use(express.static("starter"));
+
+app.use("/", geminiRoutes({ ai, upload }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -15,6 +15,7 @@
 // import "dotenv/config";
 
 // import { trace } from "console";
+// import { type } from "os";
 
 // // Persiapan project
 
@@ -26,6 +27,9 @@
 
 // app.use(cors());
 
+// app.use(express.json());
+// app.use(express.static("starter"));
+
 // const upload = multer({
 //   dest: "uploads/",
 // });
@@ -36,16 +40,16 @@
 
 // // End Point POST
 
-// app.post("/chat", async (req, res) => {
+// app.post("/api/chat", async (req, res) => {
 //   const { body } = req;
 
-//   const { prompt } = body;
+//   const { conversation } = body;
 
 //   //   Cek data yang di input di prompt
 
-//   if (!prompt || typeof prompt !== "string") {
+//   if (!conversation || !Array.isArray(conversation)) {
 //     res.status(400).json({
-//       message: "Prompt harus di isi dan berupa string!",
+//       message: "Percakapan harus di isi!",
 
 //       data: null,
 
@@ -55,15 +59,50 @@
 //     return;
 //   }
 
+//   //   Guard clouse
+//   const conversationIsValid = conversation.every((message) => {
+//     if (!message) return false;
+
+//     if (typeof message !== "object" || Array.isArray(message)) return false;
+
+//     const keys = Object.keys(message);
+//     const keysLengthIsValid = keys.length === 2;
+//     const keyContainsValidNAme = keys.every((key) =>
+//       ["role", "text"].includes(key)
+//     );
+
+//     if (!keysLengthIsValid || !keyContainsValidNAme) return false;
+
+//     const { role, text } = message;
+//     const roleIsvalid = ["user", "model"].includes(role);
+//     const textIsvalid = typeof text === "string";
+
+//     if (!roleIsvalid || !textIsvalid) return false;
+
+//     return true;
+//   });
+
+//   if (!conversationIsValid) {
+//     res.status(400).json({
+//       message: "Percakapan harus di isi!",
+
+//       data: null,
+
+//       success: false,
+//     });
+
+//     return;
+//   }
+
+//   const contents = conversation.map(({ role, text }) => ({
+//     role,
+//     parts: [{ text }],
+//   }));
+
 //   try {
 //     const aiResponse = await ai.models.generateContent({
 //       model: "gemini-2.5-flash",
-
-//       contents: [
-//         {
-//           parts: [{ text: prompt }],
-//         },
-//       ],
+//       contents,
 //     });
 
 //     res.status(200).json({
@@ -74,14 +113,14 @@
 //       message: "Berhasil diresponse oleh AI Flash",
 //     });
 //   } catch (error) {
-//     console.log(e);
+//     console.log(error);
 
 //     res.status(500).json({
 //       success: false,
 
 //       data: null,
 
-//       message: e.message || "Ada masalah di server",
+//       message: error.message || "Ada masalah di server",
 //     });
 //   }
 // });
@@ -157,7 +196,7 @@
 
 //       data: null,
 
-//       message: e.message || "Ada masalah di server",
+//       message: error.message || "Ada masalah di server",
 //     });
 //   } finally {
 //     fs.unlinkSync(req.file.path);
@@ -202,7 +241,7 @@
 
 //         data: null,
 
-//         message: e.message || "Ada masalah di server",
+//         message: error.message || "Ada masalah di server",
 //       });
 //     } finally {
 //       fs.unlinkSync(req.file.path);
